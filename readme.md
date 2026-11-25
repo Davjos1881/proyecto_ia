@@ -78,23 +78,23 @@ Separación temporal fuera de muestra: entrenamiento con 2016 a 2021 (101.188 re
 |---|---|---|
 | Densa 1 | 32 | ReLU |
 | Densa 2 | 16 | ReLU |
-| Salida | 2 | Softmax |
+| Salida | 1 | Sigmoide |
 
-En total son 1.266 parámetros. Se compila con el optimizador Adam y pérdida de entropía cruzada categórica, y se entrena durante 30 épocas con lotes de 256. Se probó Dropout como regularización y se dejó como opción, porque con la cantidad de datos disponible el modelo no muestra un sobreajuste fuerte.
+En total son 1.249 parámetros. La salida es la probabilidad de que el siniestro sea grave, y se clasifica como grave con un umbral de 0,5. Se compila con el optimizador Adam y pérdida de entropía cruzada binaria, y se entrena durante 30 épocas con lotes de 256. Se probó Dropout como regularización y se dejó como opción, porque con la cantidad de datos disponible el modelo no muestra un sobreajuste fuerte.
 
 ### Resultados
 
 | Conjunto | Exactitud | Precisión (graves) | Recall (graves) | F1 (graves) |
 |---|---|---|---|---|
-| Entrenamiento 2016-2021 | 0,78 | 0,75 | 0,61 | 0,67 |
+| Entrenamiento 2016-2021 | 0,78 | 0,74 | 0,62 | 0,68 |
 | Test 2022 | 0,76 | 0,70 | 0,80 | 0,75 |
 
 Referencias en el test: predecir siempre "solo daños" daría una exactitud de 0,551, y predecir siempre "grave" daría un F1 de 0,62 para esa clase.
 
 - El modelo supera con claridad las dos referencias simples, tanto en exactitud como en F1 de la clase grave.
 - El recall de 0,80 en el test significa que detecta unos 8 de cada 10 siniestros graves. Es la métrica que más importa para un caso de emergencias, porque es preferible una falsa alarma a no detectar un siniestro grave. La precisión de 0,70 indica que cerca de 3 de cada 10 alertas serían falsas alarmas.
-- Entre entrenamiento y test la exactitud baja apenas de 0,78 a 0,76. El recall y el F1 de graves suben en el test en parte porque la proporción de graves pasó de 37,6% a 44,9%, por lo que no deben leerse como una mejora real del modelo.
-- Las curvas de pérdida y exactitud se estabilizan con las épocas.
+- Entre entrenamiento y test la exactitud baja apenas de 0,78 a 0,76. El recall y el F1 de graves suben en el test, pero eso no es una mejora comprobada: en 2022 el modelo marca como grave a más siniestros (el recall de solo daños baja de 0,87 a 0,72) y la proporción de graves pasó de 37,6% a 44,9%, por lo que los números de ambos conjuntos no son comparables de forma directa.
+- Las curvas de pérdida y exactitud se estabilizan con las épocas
 
 ## Notebook 02: regresión del conteo diario
 
